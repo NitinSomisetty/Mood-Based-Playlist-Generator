@@ -9,8 +9,16 @@ database design, pgvector similarity search, authentication, and advanced SQL.
 - `frontend/` - Next.js application, API routes, and shared server/client code
 - `database/` - PostgreSQL schema, seed data, queries, functions, and triggers
 - `embeddings/` - Python tooling for generating 384-dimensional embeddings
-- `documentation/` - ER diagram, relational schema, and project report
+- `documentation/` - ER diagram, relational schema, data dictionary, and project report
 - `tests/` - Application and database test suites
+
+## Database design documentation
+
+The Phase 2 design deliverables are available in:
+
+- [ER diagram](documentation/ER_Diagram.md)
+- [Relational schema](documentation/Relational_Schema.md)
+- [Data dictionary and constraints](documentation/Data_Dictionary.md)
 
 ## Local setup
 

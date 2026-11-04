@@ -1,0 +1,1 @@
+-- Database triggers will be added with the corresponding schema.

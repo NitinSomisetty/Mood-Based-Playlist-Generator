@@ -1,12 +1,11 @@
-Also noSQL 
-Next js interface
-Backend/DB
-auth + min 2 roles in frontend
-GitHub
-Viva
+Mood Based Playlist Generator 
+Frontend: HTML CSS JS
+Backend: Next.js API routes
+Database: PostgreSQL + pgvector
 
 
-Things to evaluate on:
+
+Things to evaluate on and Implement - 
 ER DIAGRAM
 Relational schema with keys, relationships and constraints
 SQL DB implementation DDL with constrains
@@ -22,6 +21,13 @@ Authentication implementation (frot end and min 2 roles and role based access co
 Documentation, Git/GitHub
 Orignality, Individual contribution, modification and viva
 
+Additional things to implement :
+Also noSQL 
+Next js interface
+Backend/DB
+auth + min 2 roles in frontend
+GitHub
+Viva
 
 
 DBMS Project Report should comprise of
@@ -34,3 +40,6 @@ DBMS Project Report should comprise of
 7. Next.js- Project Tree structure
 8. Few Sample Screenshots of application code and demo
 9. Evaluation Rubrics- Completion Status
+
+
+Go through the document in the end (mini project requirements)

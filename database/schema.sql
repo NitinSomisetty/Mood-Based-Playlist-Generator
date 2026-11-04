@@ -1,0 +1,2 @@
+-- Database schema will be implemented incrementally.
+-- The final schema will use PostgreSQL and the pgvector extension.

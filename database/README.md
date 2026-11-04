@@ -1,28 +1,18 @@
-# Database DDL
+# Database
 
-## Phase 4 files
+The Supabase CLI is now the canonical migration workflow:
 
-- `schema.sql` is the idempotent project DDL. It preserves the existing
-  Supabase naming contract (`app_users`, `songs.duration`, and
-  `playlists.title`), creates missing relations, applies schema adjustments,
-  adds constraints and relational indexes, demonstrates `ALTER TABLE`, and
-  safely demonstrates `DROP` using a temporary table.
-- `verify_schema.sql` runs duplicate-key, invalid-role, invalid-foreign-key,
-  negative-duration, and cascade-deletion checks inside a transaction that is
-  rolled back.
+- [`../supabase/config.toml`](../supabase/config.toml) contains non-secret
+  project settings.
+- [`../supabase/migrations/`](../supabase/migrations/) contains the existing
+  SQL migrations, moved into timestamped filenames in dependency order.
+- [`../supabase/seed.sql`](../supabase/seed.sql) contains development-only
+  sample data.
 
-Run the schema against the project database:
+The older [`schema.sql`](schema.sql) and [`verify_schema.sql`](verify_schema.sql)
+files remain as a compatibility reference and verification script. They are
+not part of the Supabase CLI migration path. Do not run `schema.sql` after
+applying the canonical migrations, because that would replay overlapping DDL.
 
-```text
-psql "$DATABASE_URL" -f database/schema.sql
-```
-
-Then run the verification script:
-
-```text
-psql "$DATABASE_URL" -f database/verify_schema.sql
-```
-
-Vector HNSW indexes are intentionally not created by `schema.sql`; they
-remain in `migrations/004_create_indexes.sql` and should be applied after
-embeddings and the vector-search workload are available.
+The migration workflow and the safe existing-database linking procedure are
+documented in the repository [README](../README.md).

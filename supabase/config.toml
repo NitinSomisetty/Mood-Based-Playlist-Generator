@@ -1,0 +1,7 @@
+# This file is safe to commit. The project reference is supplied by
+# `supabase link --project-ref` and credentials are never stored here.
+project_id = "mood-based-playlist-generator"
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]

@@ -8,6 +8,11 @@ dist/
 .env.*.local
 !.env.example
 
+.supabase/
+supabase/.branches/
+supabase/.temp/
+supabase/.env
+
 __pycache__/
 *.py[cod]
 .venv/

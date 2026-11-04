@@ -15,6 +15,24 @@ supporting `PLAYLIST_HISTORY` audit relation. It defines primary keys,
 foreign keys, unique constraints, cardinalities, nullable attributes, domain
 constraints, and the 384-dimensional pgvector embedding attributes.
 
+## Phase 5: DML and SQL query implementation
+
+[`database/queries.sql`](../database/queries.sql) contains labelled examples
+for INSERT, SELECT, UPDATE, DELETE, joins, aggregate functions, `GROUP BY`
+and `HAVING`, nested queries, correlated `EXISTS`, CTEs, ranking, playlist
+statistics, and mood-based recommendation candidates.
+
+The application integration uses the shared PostgreSQL pool in
+[`frontend/lib/db.ts`](../frontend/lib/db.ts) and the parameterized
+[`library` route](../frontend/app/api/library/route.ts). The page supports
+adding a song with its mood relationship, filtering songs by mood, renaming
+playlists, and deleting saved private playlists. Mutations refresh the
+displayed data and return explicit errors.
+
+The current schema has no `genres` relation or `parent_genre_id`, so the
+genre join and recursive hierarchy query are documented limitations in
+`queries.sql`; they are not claimed as validated executable queries.
+
 ## Phase 4: DDL implementation
 
 The executable DDL is in [`database/schema.sql`](../database/schema.sql). It

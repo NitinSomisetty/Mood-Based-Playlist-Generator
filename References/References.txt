@@ -1,0 +1,36 @@
+Also noSQL 
+Next js interface
+Backend/DB
+auth + min 2 roles in frontend
+GitHub
+Viva
+
+
+Things to evaluate on:
+ER DIAGRAM
+Relational schema with keys, relationships and constraints
+SQL DB implementation DDL with constrains
+NoSQL/VectorDB creation
+Technology justification
+DML operations
+Nested/correlated/recursive queries, Join SQL queries
+Advacned SQL Concepts (functions, triggers, ctes)
+NoSQL/ Vector feature 
+NExt.js interface
+Backend/API and DB integration
+Authentication implementation (frot end and min 2 roles and role based access control in DB)
+Documentation, Git/GitHub
+Orignality, Individual contribution, modification and viva
+
+
+
+DBMS Project Report should comprise of
+1. Title
+2. Students SRN and Name
+3. Abstract
+4. Tech Stack
+5. SQL -Database commands
+6. NoSQL/Vector Database Commands
+7. Next.js- Project Tree structure
+8. Few Sample Screenshots of application code and demo
+9. Evaluation Rubrics- Completion Status

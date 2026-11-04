@@ -1,1 +1,0 @@
--- Stored functions and procedures will be added with the corresponding schema.

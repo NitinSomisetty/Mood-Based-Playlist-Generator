@@ -1,1 +1,0 @@
--- Development seed data will be added after the relational schema is finalized.

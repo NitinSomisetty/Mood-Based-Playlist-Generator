@@ -94,3 +94,21 @@ migration rather than rewriting a migration already applied remotely.
 
 The database file layout is also documented in
 [`database/README.md`](database/README.md).
+
+## Phase 5: DML and SQL queries
+
+The complete, labelled SQL demonstration file is
+[`database/queries.sql`](database/queries.sql). It covers DML, joins,
+aggregates, `GROUP BY`/`HAVING`, nested and correlated queries, CTEs, and
+recommendation candidates using the existing schema.
+
+The application uses the existing `pg` dependency and the shared pool in
+[`frontend/lib/db.ts`](frontend/lib/db.ts). Its
+[`/api/library`](frontend/app/api/library/route.ts) route supports adding a
+song, filtering songs by mood, renaming playlists, and deleting saved private
+playlists. The starter page now exposes those operations with loading and
+error feedback.
+
+The current Supabase schema does not contain `genres` or `parent_genre_id`.
+The genre join and recursive CTE are therefore documented as non-executable
+templates in `database/queries.sql` rather than inventing an unapproved table.

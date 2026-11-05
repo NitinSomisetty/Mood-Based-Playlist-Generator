@@ -1,0 +1,2 @@
+# Vector strategy
+Song embeddings concatenate title, artist, lyrics and description; mood embeddings concatenate name and description. The target model is `all-MiniLM-L6-v2` (384 dimensions). pgvector stores vectors beside relational rows, avoiding cross-database joins while preserving ACID transactions. Cosine distance (`<=>`) and `vector_cosine_ops` power retrieval. The local demo uses deterministic vectors so it runs without a model service; production replaces `lib/embeddings/embed.ts` with model inference.

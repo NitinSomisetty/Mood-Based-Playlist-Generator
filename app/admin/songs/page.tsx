@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function Songs(){return <section><Link href="/admin" className="muted">← Admin console</Link><div className="section-head"><div><div className="eyebrow">Content management</div><h1>Song catalogue</h1></div></div><div className="card"><h2>Database-backed catalogue</h2><p className="muted">Song CRUD is protected server-side for administrators. Use the API or SQL editor to manage the music library.</p><p className="admin-link">POST, PATCH, and DELETE operations are available at <code>/api/songs</code>.</p></div></section>}

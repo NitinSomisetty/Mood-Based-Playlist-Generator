@@ -1,0 +1,2 @@
+# Technology justification
+Next.js 14 App Router provides a typed full-stack UI and API routes. PostgreSQL with `pg` raw SQL keeps joins, constraints, triggers, CTEs and vector operators visible for the DBMS rubric. Supabase supplies managed PostgreSQL and pgvector. Passwords use bcryptjs; signed HS256 JWTs in an httpOnly cookie provide a small, auditable session layer. RLS policies are enabled in the database, while API routes re-check ownership and role.

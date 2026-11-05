@@ -1,6 +1,0 @@
--- Legacy compatibility entry point.
---
--- The executable database definition is maintained only in the ordered
--- Supabase CLI migrations under ../supabase/migrations/. This file remains
--- so older links do not break, but intentionally contains no duplicate DDL.
--- Do not execute it against the linked database.

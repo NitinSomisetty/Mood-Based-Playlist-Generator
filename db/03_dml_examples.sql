@@ -1,27 +1,208 @@
--- INSERT RETURNING: create a playlist and capture its generated UUID.
-INSERT INTO playlists(user_id,name,mood_input) SELECT user_id,'Rainy evening','calm rainy evening' FROM users WHERE username='alex' RETURNING playlist_id;
--- The SQL Editor does not substitute :playlist_id/:song_id placeholders.
--- The examples below choose an existing seeded row so they can be run directly.
--- UPDATE DML: save the most recently created Rainy evening playlist.
-UPDATE playlists SET is_saved=true,updated_at=now()
-WHERE playlist_id=(SELECT playlist_id FROM playlists WHERE name='Rainy evening' ORDER BY created_at DESC LIMIT 1);
--- DELETE DML: composite key identifies exactly one song membership.
-DELETE FROM playlist_songs
-WHERE playlist_id=(SELECT playlist_id FROM playlists WHERE name='Alex Calm Collection' LIMIT 1)
-  AND song_id=(SELECT song_id FROM playlist_songs WHERE playlist_id=(SELECT playlist_id FROM playlists WHERE name='Alex Calm Collection' LIMIT 1) ORDER BY position LIMIT 1);
--- JOIN: songs and their mood tags in a seeded playlist.
-SELECT p.name,s.title,s.artist,m.mood_name
-FROM playlists p
-JOIN playlist_songs ps ON ps.playlist_id=p.playlist_id
-JOIN songs s ON s.song_id=ps.song_id
-LEFT JOIN song_moods sm ON sm.song_id=s.song_id
-LEFT JOIN moods m ON m.mood_id=sm.mood_id
-WHERE p.name='Alex Calm Collection';
--- GROUP/HAVING: moods represented by more than N playlists.
-SELECT m.mood_name,count(p.playlist_id) AS generated FROM moods m JOIN playlists p USING(mood_id) GROUP BY m.mood_id HAVING count(p.playlist_id)>1;
--- Correlated subquery: users with no saved playlist.
-SELECT u.username FROM users u WHERE NOT EXISTS(SELECT 1 FROM playlists p WHERE p.user_id=u.user_id AND p.is_saved);
--- Nested subquery: five most frequently included songs.
-SELECT * FROM (SELECT s.title,count(*) AS appearances FROM songs s JOIN playlist_songs ps USING(song_id) GROUP BY s.song_id,s.title) popular ORDER BY appearances DESC LIMIT 5;
--- Recursive CTE is useful for backfilling daily stats over a date range.
-WITH RECURSIVE days(d) AS (SELECT CURRENT_DATE-6 UNION ALL SELECT d+1 FROM days WHERE d<CURRENT_DATE) SELECT d,m.mood_name FROM days CROSS JOIN moods m ORDER BY d;
+-- ============================================================================
+-- PHASE 5: DML AND QUERY DEMONSTRATIONS
+-- ============================================================================
+-- Run this file in the Supabase SQL Editor after 01_schema.sql and 02_seed_data.sql.
+--
+-- IMPORTANT:
+-- * Every example below is commented out intentionally.
+-- * Uncomment only ONE block at a time before clicking Run.
+-- * SELECT blocks are read-only.
+-- * INSERT, UPDATE, and DELETE blocks change data. Use BEGIN/ROLLBACK first
+--   when practising, or replace the example values with your own IDs.
+-- * Supabase SQL Editor does not substitute :parameters. Replace example
+--   values such as 'alex' or a playlist name directly.
+--
+-- Existing tables used:
+-- users, moods, songs, song_moods, playlists, playlist_songs,
+-- user_mood_history, mood_stats, playlist_history.
+
+-- ============================================================================
+-- 1. INSERT
+-- Add one playlist for the seeded user "alex".
+-- This returns the generated UUID so it can be used in later examples.
+-- DATA-CHANGING: uncomment only when you want to create a playlist.
+-- ============================================================================
+-- INSERT INTO playlists (user_id, name, mood_input)
+-- SELECT user_id, 'Rainy Evening', 'calm music for a rainy evening'
+-- FROM users
+-- WHERE username = 'alex'
+-- RETURNING playlist_id, name, mood_input, is_saved;
+
+-- ============================================================================
+-- 2. UPDATE
+-- Mark the newest "Rainy Evening" playlist as saved.
+-- DATA-CHANGING: updates one matching playlist.
+-- ============================================================================
+-- UPDATE playlists
+-- SET is_saved = TRUE,
+--     updated_at = NOW()
+-- WHERE playlist_id = (
+--     SELECT playlist_id
+--     FROM playlists
+--     WHERE name = 'Rainy Evening'
+--     ORDER BY created_at DESC
+--     LIMIT 1
+-- )
+-- RETURNING playlist_id, name, is_saved, updated_at;
+
+-- ============================================================================
+-- 3. DELETE
+-- Remove one saved playlist owned by "alex".
+-- ON DELETE CASCADE removes its playlist_songs rows automatically.
+-- DATA-CHANGING: the playlist and its dependent rows are permanently removed.
+-- ============================================================================
+-- DELETE FROM playlists
+-- WHERE playlist_id = (
+--     SELECT p.playlist_id
+--     FROM playlists AS p
+--     JOIN users AS u ON u.user_id = p.user_id
+--     WHERE u.username = 'alex'
+--       AND p.is_saved = TRUE
+--     ORDER BY p.created_at DESC
+--     LIMIT 1
+-- )
+-- RETURNING playlist_id, name, is_saved;
+
+-- ============================================================================
+-- 4. SELECT: songs in a playlist
+-- INNER JOIN demonstrates a playlist-to-song relationship.
+-- READ-ONLY.
+-- ============================================================================
+-- SELECT p.name AS playlist_name,
+--        ps.position,
+--        s.title,
+--        s.artist,
+--        s.duration_seconds
+-- FROM playlists AS p
+-- JOIN playlist_songs AS ps ON ps.playlist_id = p.playlist_id
+-- JOIN songs AS s ON s.song_id = ps.song_id
+-- WHERE p.name = 'Alex Calm Collection'
+-- ORDER BY ps.position;
+
+-- ============================================================================
+-- 5. SELECT: songs and their mood tags
+-- LEFT JOIN keeps songs visible even when they have no mood tag.
+-- READ-ONLY.
+-- ============================================================================
+-- SELECT s.song_id,
+--        s.title,
+--        s.artist,
+--        m.mood_name,
+--        sm.relevance_score
+-- FROM songs AS s
+-- LEFT JOIN song_moods AS sm ON sm.song_id = s.song_id
+-- LEFT JOIN moods AS m ON m.mood_id = sm.mood_id
+-- ORDER BY s.title, m.mood_name;
+
+-- ============================================================================
+-- 6. GROUP BY and HAVING
+-- Find moods used in more than five playlists.
+-- READ-ONLY.
+-- ============================================================================
+-- SELECT m.mood_name,
+--        COUNT(p.playlist_id)::INTEGER AS playlist_count
+-- FROM moods AS m
+-- JOIN playlists AS p ON p.mood_id = m.mood_id
+-- GROUP BY m.mood_id, m.mood_name
+-- HAVING COUNT(p.playlist_id) > 5
+-- ORDER BY playlist_count DESC, m.mood_name;
+
+-- ============================================================================
+-- 7. AGGREGATE FUNCTIONS
+-- Demonstrates COUNT, AVG, MAX, MIN, and SUM in separate read-only queries.
+-- ============================================================================
+-- -- COUNT: songs associated with each mood.
+-- SELECT m.mood_name, COUNT(sm.song_id)::INTEGER AS song_count
+-- FROM moods AS m
+-- LEFT JOIN song_moods AS sm ON sm.mood_id = m.mood_id
+-- GROUP BY m.mood_id, m.mood_name
+-- ORDER BY song_count DESC;
+
+-- -- AVG: average song duration in seconds.
+-- SELECT AVG(duration_seconds)::NUMERIC(10,2) AS average_duration_seconds
+-- FROM songs;
+
+-- -- MAX: longest song in seconds.
+-- SELECT MAX(duration_seconds) AS longest_duration_seconds
+-- FROM songs;
+
+-- -- MIN: shortest song in seconds.
+-- SELECT MIN(duration_seconds) AS shortest_duration_seconds
+-- FROM songs;
+
+-- -- SUM: total duration of one playlist in seconds.
+-- SELECT p.name AS playlist_name,
+--        COALESCE(SUM(s.duration_seconds), 0)::BIGINT AS total_duration_seconds
+-- FROM playlists AS p
+-- LEFT JOIN playlist_songs AS ps ON ps.playlist_id = p.playlist_id
+-- LEFT JOIN songs AS s ON s.song_id = ps.song_id
+-- WHERE p.name = 'Alex Calm Collection'
+-- GROUP BY p.playlist_id, p.name;
+
+-- ============================================================================
+-- 8. NESTED SUBQUERY
+-- Find songs whose duration exceeds the average duration of all songs.
+-- READ-ONLY.
+-- ============================================================================
+-- SELECT song_id, title, artist, duration_seconds
+-- FROM songs
+-- WHERE duration_seconds > (
+--     SELECT AVG(duration_seconds)
+--     FROM songs
+-- )
+-- ORDER BY duration_seconds DESC;
+
+-- ============================================================================
+-- 9. CORRELATED SUBQUERY
+-- Find users who have created at least one playlist.
+-- The inner query refers to the current outer user row.
+-- READ-ONLY.
+-- ============================================================================
+-- SELECT u.user_id, u.username, u.email
+-- FROM users AS u
+-- WHERE EXISTS (
+--     SELECT 1
+--     FROM playlists AS p
+--     WHERE p.user_id = u.user_id
+-- )
+-- ORDER BY u.username;
+
+-- ============================================================================
+-- 10. CTE WITH WINDOW FUNCTION
+-- Find the five most frequently included songs.
+-- READ-ONLY.
+-- ============================================================================
+-- WITH song_usage AS (
+--     SELECT s.song_id,
+--            s.title,
+--            s.artist,
+--            COUNT(*)::INTEGER AS appearances,
+--            RANK() OVER (ORDER BY COUNT(*) DESC) AS usage_rank
+--     FROM songs AS s
+--     JOIN playlist_songs AS ps ON ps.song_id = s.song_id
+--     GROUP BY s.song_id, s.title, s.artist
+-- )
+-- SELECT *
+-- FROM song_usage
+-- WHERE usage_rank <= 5
+-- ORDER BY usage_rank, title;
+
+-- ============================================================================
+-- 11. RECURSIVE CTE
+-- This project has no genres table or parent_genre_id column. The executable
+-- recursive example below generates the last seven calendar dates and pairs
+-- them with all moods, which is useful for mood_stats reporting.
+-- READ-ONLY.
+-- ============================================================================
+-- WITH RECURSIVE days(day) AS (
+--     SELECT CURRENT_DATE - 6
+--     UNION ALL
+--     SELECT day + 1
+--     FROM days
+--     WHERE day < CURRENT_DATE
+-- )
+-- SELECT d.day,
+--        m.mood_name
+-- FROM days AS d
+-- CROSS JOIN moods AS m
+-- ORDER BY d.day, m.mood_name;

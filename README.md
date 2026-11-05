@@ -12,4 +12,11 @@ To verify the connection before using the UI, open `http://localhost:3000/api/he
 
 Architecture: `Next.js UI → API route → pg Pool/raw SQL → Supabase PostgreSQL + pgvector`.
 
+The application now includes semantic search on the home page, mood-based
+filtering through playlist generation, dashboard statistics, and administrator
+song CRUD at `/admin/songs`. Protected playlist requests set the transaction
+local `app.user_id` and `app.role` values expected by the RLS policies. Run
+`db/07_validation.sql` as part of setup to add database-level validation for
+user identity fields and playlist text fields.
+
 `03_dml_examples.sql` and `05_vector_search.sql` are demonstration queries; run them manually in the SQL editor. Demo users are `admin@moodmix.demo`, `alex@moodmix.demo`, and `maya@moodmix.demo`; change seeded credentials before deployment. The included deterministic embedding fallback is intentionally offline-friendly; see `docs/vector-strategy.md` for production model integration.

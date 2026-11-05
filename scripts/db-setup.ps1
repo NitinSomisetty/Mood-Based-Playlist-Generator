@@ -9,7 +9,8 @@ $files = @(
   "db/01_schema.sql",
   "db/02_seed_data.sql",
   "db/04_advanced.sql",
-  "db/06_rls_policies.sql"
+  "db/06_rls_policies.sql",
+  "db/07_validation.sql"
 )
 
 foreach ($file in $files) {

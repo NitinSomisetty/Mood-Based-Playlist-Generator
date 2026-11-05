@@ -56,13 +56,13 @@ WHERE s.title LIKE 'MoodMix Session %'
 -- vectors while leaving production/imported song embeddings untouched.
 UPDATE songs s
 SET embedding=('['||array_to_string(ARRAY(
-  SELECT (CASE WHEN floor((i-1)/48)=c.cluster THEN 1 ELSE 0 END + 0.02*sin(c.seed*i))::text
+  SELECT (CASE WHEN floor((i-1)/48)=c.cluster THEN 1 ELSE 0 END + 0.12*sin(c.seed*i))::text
   FROM generate_series(1,384) i),',')||']')::vector
 FROM (SELECT s2.song_id,
   CASE WHEN array_position(ARRAY['Midnight Windows','Soft Focus','Electric Bloom','Rain on Glass','Golden Hour Drive','Afterglow','Velvet Skies','Northbound','Slow Motion','Paper Planes','City Lights','Sunday Morning','Neon Dreams','Wildflower Season','Blue Room','First Light','Starlit Avenue','Parallel Lines','Ocean Air','Gravity Games','Homecoming','Summer Static','Cloud Nine','Last Train Home','Warm Coffee','Silver Lining','Open Roads','Moonlit Walk','Heartbeat Cinema','Daydream Radio','Quiet Thunder','Polaroid Sunset','New Perspective','Late Night Letters','Distant Signals','Sunrise Social','Echoes in June','Better Days','Velour Nights','Wanderlust'],s2.title) IS NOT NULL
     THEN (array_position(ARRAY['Midnight Windows','Soft Focus','Electric Bloom','Rain on Glass','Golden Hour Drive','Afterglow','Velvet Skies','Northbound','Slow Motion','Paper Planes','City Lights','Sunday Morning','Neon Dreams','Wildflower Season','Blue Room','First Light','Starlit Avenue','Parallel Lines','Ocean Air','Gravity Games','Homecoming','Summer Static','Cloud Nine','Last Train Home','Warm Coffee','Silver Lining','Open Roads','Moonlit Walk','Heartbeat Cinema','Daydream Radio','Quiet Thunder','Polaroid Sunset','New Perspective','Late Night Letters','Distant Signals','Sunrise Social','Echoes in June','Better Days','Velour Nights','Wanderlust'],s2.title)-1)%8
     ELSE (array_position(ARRAY['Blue Hour','Sunset Lover','Static Hearts','Falling Slowly','Daylight Again','Parallel Skies','Honey on the Radio','Velvet Morning','Little Victories','Midnight Drive','Halfway Home','Wild Hearts','Satellite Love','Clearwater','Dream Sequence','Dancing Alone','Soft Rebellion','Golden Streets','Open Window','Night Garden','Bright Side','Slow Burn','Moon River Road','Quietly Brave','Electric Feelings','Sunday Best','Gravity Well','Summer Rain','City After Dark','Ocean Between Us','Still Here','Paper Moon','Candlelight','Runaway Season','Bluebird','All the Way Up','Dust and Gold','Lunar Tide','Hometown Lights','No Regrets','Cloud Atlas','Silver Streets','Easy Does It','Heart Like Thunder','Memory Lane','Day One','Warm Front','Neon Sunrise','The Long Way','Wildflower Waltz','Porcelain','Good Company','After the Storm','Dreamer State','North Star','Soft Landing','Golden Thread','Late Bloom','Kindred','Home Again'],s2.title)-1+40)%8 END AS cluster,
-  COALESCE(NULLIF(regexp_replace(s2.title,'[^0-9]','','g'),''),'1')::int AS seed
+  mod(abs(hashtext(s2.title)::bigint),997)+1 AS seed
   FROM songs s2) c
 WHERE s.song_id=c.song_id;
 
